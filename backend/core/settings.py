@@ -3,7 +3,6 @@ from pathlib import Path
 import os
 import environ
 
-
 env = environ.Env()
 environ.Env.read_env()
 ENVIRONMENT = env
@@ -105,6 +104,7 @@ DATABASES['default']['ATOMIC_REQUESTS'] = True
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://localhost:8000',
+    'http://127.0.0.1:8000',
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     'https://vudera.com',
@@ -113,6 +113,7 @@ CORS_ORIGIN_WHITELIST = [
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:8000',
+    'http://127.0.0.1:8000',
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     'https://vudera.com',
@@ -163,7 +164,7 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-#STATICFILES_DIRS = [BASE_DIR / 'build/static']
+# STATICFILES_DIRS = [BASE_DIR / 'build/static']
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -188,7 +189,7 @@ AUTHENTICATION_BACKENDS = (
 )
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('JWT', ),
+    'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10080),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
     'ROTATE_REFRESH_TOKENS': True,
@@ -221,14 +222,13 @@ DJOSER = {
     },
 }
 
-
 AUTH_USER_MODEL = 'user.UserAccount'
 
-EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 if not DEBUG:
     DEFAULT_FROM_EMAIL = 'Vudera - Academia de Software <mail@vudera.com>'
-    EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_HOST = env('EMAIL_HOST')
     EMAIL_HOST_USER = env('EMAIL_HOST_USER')
     EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
