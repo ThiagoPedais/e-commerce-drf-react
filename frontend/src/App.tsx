@@ -6,7 +6,7 @@ import './App.css'
 import { Error404 } from './containers/errors/Error404'
 import { Home } from './containers/Home'
 import Signup from './containers/auth/Signup'
-import { Login } from './containers/auth/Login'
+import Login from './containers/auth/Login'
 import Activate from './containers/auth/Activate'
 
 

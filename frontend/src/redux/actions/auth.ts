@@ -7,12 +7,60 @@ import {
     ACTIVATION_FAIL,
     ACTIVATION_SUCCESS,
     SET_AUTH_LOADING,
-    REMOVE_AUTH_LOADING
+    REMOVE_AUTH_LOADING,
+    USER_LOADED_SUCCESS,
+    USER_LOADED_FAIL,
+    AUTHENTICATED_FAIL,
+    AUTHENTICATED_SUCCESS,
+    REFRESH_FAIL,
+    REFRESH_SUCCESS
 } from './types'
 import { setALert } from './alert'
 
 import axios from 'axios'
 
+
+
+export const check_authenticated = () => async (dispatch: Dispatch) => {
+    if (localStorage.getItem('access')) {
+        const config = {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }
+
+        const body = JSON.stringify({
+            token: localStorage.getItem('access')
+        })
+
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/jwt/verify/`, body, config)
+
+            if (res.status === 200) {
+                dispatch({
+                    type: AUTHENTICATED_SUCCESS
+                })
+            }
+            else {
+                dispatch({
+                    type: AUTHENTICATED_FAIL
+                })
+            }
+
+        }
+        catch (error) {
+            dispatch({
+                type: AUTHENTICATED_FAIL
+            })
+        }
+    }
+    else {
+        dispatch({
+            type: AUTHENTICATED_FAIL
+        })
+    }
+}
 
 
 export const signup = (first_name: string, last_name: string, email: string, password: string, re_password: string) =>
@@ -43,7 +91,7 @@ export const signup = (first_name: string, last_name: string, email: string, pas
                     type: SIGNUP_SUCCESS,
                     payload: res.data
                 })
-                dispatch(setALert('We send a email, please activate your account. Look the box spam', 'green') as any) 
+                dispatch(setALert('We send a email, please activate your account. Look the box spam', 'green') as any)
 
             }
             else {
@@ -69,6 +117,45 @@ export const signup = (first_name: string, last_name: string, email: string, pas
     }
 
 
+export const load_user = () => async (dispatch: Dispatch) => {
+    if (localStorage.getItem('access')) {
+        const config = {
+            headers: {
+                'Authorization': `JWT ${localStorage.getItem('access')}`,
+                'Accept': 'application/json'
+            }
+        }
+
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/users/me/`, config)
+
+            if (res.status === 200) {
+                dispatch({
+                    type: USER_LOADED_SUCCESS,
+                    payload: res.data
+                })
+            }
+            else {
+                dispatch({
+                    type: USER_LOADED_FAIL
+                })
+            }
+        }
+        catch (err) {
+            dispatch({
+                type: USER_LOADED_FAIL
+            })
+        }
+    }
+    else {
+        dispatch({
+            type: USER_LOADED_FAIL
+        })
+    }
+
+}
+
+
 export const login = (email: string, password: string) => async (dispatch: Dispatch) => {
     dispatch({
         type: SET_AUTH_LOADING
@@ -88,11 +175,12 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
     try {
         const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/jwt/create/`, body, config)
 
-        if(res.status === 200){
+        if (res.status === 200) {
             dispatch({
                 type: LOGIN_SUCCESS,
                 payload: res.data
             })
+            dispatch(load_user() as any)
             dispatch({
                 type: REMOVE_AUTH_LOADING
             })
@@ -100,7 +188,7 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
         }
         else {
             dispatch({
-                type: LOGIN_FAIL                
+                type: LOGIN_FAIL
             })
             dispatch({
                 type: REMOVE_AUTH_LOADING
@@ -108,9 +196,9 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
             dispatch(setALert('Error when logging in :(', '#ff0000') as any)
         }
 
-    } catch(err){
+    } catch (err) {
         dispatch({
-            type: LOGIN_FAIL                
+            type: LOGIN_FAIL
         })
         dispatch({
             type: REMOVE_AUTH_LOADING
@@ -121,49 +209,93 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
 
 
 export const activate = (uid: string, token: string) => async (dispatch: Dispatch) => {
-        dispatch({
-            type: SET_AUTH_LOADING
-        })
-        
+    dispatch({
+        type: SET_AUTH_LOADING
+    })
 
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    const body = JSON.stringify({
+        uid,
+        token,
+    })
+
+    try {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/users/activation/`, body, config)
+
+        if (res.status === 204) {
+            dispatch({
+                type: ACTIVATION_SUCCESS
+            })
+            dispatch(setALert('Account activate with succeful', 'green') as any)
+        }
+        else {
+            dispatch({
+                type: ACTIVATION_FAIL
+            })
+            dispatch(setALert('Error to activate account', 'red') as any)
+        }
+        dispatch({
+            type: REMOVE_AUTH_LOADING
+        })
+
+    }
+    catch (err) {
+        dispatch({
+            type: ACTIVATION_FAIL
+        })
+        dispatch({
+            type: REMOVE_AUTH_LOADING
+        })
+        dispatch(setALert('Error to connect with server. Please, try later', 'red') as any)
+    }
+}
+
+
+export const refresh = () => async (dispatch: Dispatch) => {
+    if (localStorage.getItem('refresh')) {
         const config = {
             headers: {
+                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
         }
 
         const body = JSON.stringify({
-            uid,
-            token,
+            refresh: localStorage.getItem('refresh')
         })
 
         try {
             const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/users/activation/`, body, config)
 
-            if (res.status === 204) {
+            if (res.status === 200) {
                 dispatch({
-                    type: ACTIVATION_SUCCESS
-                })
-                dispatch(setALert('Account activate with succeful', 'green') as any)
+                    type: REFRESH_SUCCESS,
+                    payload: res.data
+                })                
             }
             else {
                 dispatch({
-                    type: ACTIVATION_FAIL
-                })
-                dispatch(setALert('Error to activate account', 'red') as any)
-            }
+                    type: REFRESH_FAIL
+                })                
+            }            
+        }
+        catch (error) {
             dispatch({
-                type: REMOVE_AUTH_LOADING
+                type: REFRESH_FAIL
             })
+        }
 
-        }
-        catch (err) {
-            dispatch({
-                type: ACTIVATION_FAIL
-            })
-            dispatch({
-                type: REMOVE_AUTH_LOADING
-            })
-            dispatch(setALert('Error to connect with server. Please, try later', 'red') as any)
-        }
     }
+    else {
+        dispatch({
+            type: REFRESH_FAIL
+        })
+    }
+}
+

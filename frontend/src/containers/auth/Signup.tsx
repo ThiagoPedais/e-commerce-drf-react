@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import Layout from "../../hocs/Layout";
 import { User } from "../../types/User";
-
-// import connect from 'react-redux'
 import { signup } from "../../redux/actions/auth";
 import { connect } from "react-redux";
 
@@ -42,6 +40,7 @@ function Singup({ signup }: any) {
         // console.log(formData);
         signup(first_name, last_name, email, password, re_password);
         setAccountCreated(true)
+        window.scrollTo(0,0)
 
     }
 
