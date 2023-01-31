@@ -1,12 +1,13 @@
 import {
     SIGNUP_FAIL,
     SIGNUP_SUCCESS,
+    LOGIN_FAIL,
+    LOGIN_SUCCESS,
     ACTIVATION_FAIL,
     ACTIVATION_SUCCESS,
     REMOVE_AUTH_LOADING,
     SET_AUTH_LOADING
 } from '../actions/types'
-import axios from 'axios'
 import { AnyAction } from 'redux'
 
 const initialState = {
@@ -38,8 +39,20 @@ export default function Auth(state = initialState, action: AnyAction) {
                 ...state
             }
 
+        case LOGIN_SUCCESS:
+            localStorage.setItem('access', payload.access)
+            localStorage.setItem('refresh', payload.refresh)
+            return{
+                ...state,
+                isAthenticated: true,
+                access: localStorage.getItem('access'),
+                refresh: localStorage.getItem('refresh')
+
+            }
+
         case SIGNUP_SUCCESS:
         case SIGNUP_FAIL:
+        case LOGIN_FAIL:
             localStorage.removeItem('access')
             localStorage.removeItem('refresh')
             return {
