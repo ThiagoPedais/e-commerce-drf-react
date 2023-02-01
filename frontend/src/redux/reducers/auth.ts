@@ -12,7 +12,12 @@ import {
     AUTHENTICATED_FAIL,
     AUTHENTICATED_SUCCESS,
     REFRESH_FAIL,
-    REFRESH_SUCCESS
+    REFRESH_SUCCESS,
+    LOGOUT,
+    RESET_PASSWORD_SUCCESS,
+    RESET_PASSWORD_FAIL,
+    RESET_PASSWORD_CONFIRM_FAIL,
+    RESET_PASSWORD_CONFIRM_SUCCESS
 } from '../actions/types'
 import { AnyAction } from 'redux'
 
@@ -21,7 +26,7 @@ const initialState = {
     refresh: localStorage.getItem('refresh'),
     isAuthenticated: null,
     user: null,
-    loading: null
+    loading: false
 }
 
 export default function Auth(state = initialState, action: AnyAction) {
@@ -49,7 +54,7 @@ export default function Auth(state = initialState, action: AnyAction) {
                 ...state,
                 user: null
             }
-        
+
         case AUTHENTICATED_SUCCESS:
             return {
                 ...state,
@@ -60,9 +65,9 @@ export default function Auth(state = initialState, action: AnyAction) {
             localStorage.removeItem('refresh')
             return {
                 ...state,
-                isAuthenticated: true,
+                isAuthenticated: false,
                 access: null,
-                refres: null
+                refresh: null,
 
             }
 
@@ -72,7 +77,7 @@ export default function Auth(state = initialState, action: AnyAction) {
             localStorage.setItem('refresh', payload.refresh)
             return {
                 ...state,
-                isAthenticated: true,
+                isAuthenticated: true,
                 access: localStorage.getItem('access'),
                 refresh: localStorage.getItem('refresh')
 
@@ -80,10 +85,14 @@ export default function Auth(state = initialState, action: AnyAction) {
 
         case ACTIVATION_SUCCESS:
         case ACTIVATION_FAIL:
+        case RESET_PASSWORD_SUCCESS:
+        case RESET_PASSWORD_FAIL:
+        case RESET_PASSWORD_CONFIRM_FAIL:
+        case RESET_PASSWORD_CONFIRM_SUCCESS:
             return {
                 ...state
             }
-        
+
         case REFRESH_SUCCESS:
             localStorage.setItem('access', payload.access)
             return {
@@ -96,6 +105,7 @@ export default function Auth(state = initialState, action: AnyAction) {
         case SIGNUP_FAIL:
         case LOGIN_FAIL:
         case REFRESH_FAIL:
+        case LOGOUT:
             localStorage.removeItem('access')
             localStorage.removeItem('refresh')
             return {
@@ -103,7 +113,7 @@ export default function Auth(state = initialState, action: AnyAction) {
                 access: null,
                 refresh: null,
                 isAuthenticated: false,
-                user: null
+                user: null,
             }
 
         default:

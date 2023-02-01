@@ -13,7 +13,12 @@ import {
     AUTHENTICATED_FAIL,
     AUTHENTICATED_SUCCESS,
     REFRESH_FAIL,
-    REFRESH_SUCCESS
+    REFRESH_SUCCESS,
+    LOGOUT,
+    RESET_PASSWORD_SUCCESS,
+    RESET_PASSWORD_FAIL,
+    RESET_PASSWORD_CONFIRM_FAIL,
+    RESET_PASSWORD_CONFIRM_SUCCESS
 } from './types'
 import { setALert } from './alert'
 
@@ -50,6 +55,8 @@ export const check_authenticated = () => async (dispatch: Dispatch) => {
 
         }
         catch (error) {
+            console.log(error);
+            
             dispatch({
                 type: AUTHENTICATED_FAIL
             })
@@ -105,7 +112,9 @@ export const signup = (first_name: string, last_name: string, email: string, pas
                 type: REMOVE_AUTH_LOADING
             })
         }
-        catch (err) {
+        catch (error) {
+            console.log(error);
+            
             dispatch({
                 type: SIGNUP_FAIL,
             })
@@ -196,7 +205,9 @@ export const login = (email: string, password: string) => async (dispatch: Dispa
             dispatch(setALert('Error when logging in :(', '#ff0000') as any)
         }
 
-    } catch (err) {
+    } catch (error) {
+        console.log(error);
+
         dispatch({
             type: LOGIN_FAIL
         })
@@ -232,7 +243,7 @@ export const activate = (uid: string, token: string) => async (dispatch: Dispatc
             dispatch({
                 type: ACTIVATION_SUCCESS
             })
-            dispatch(setALert('Account activate with succeful', 'green') as any)
+            dispatch(setALert('Account activate with successfully', 'green') as any)
         }
         else {
             dispatch({
@@ -257,45 +268,152 @@ export const activate = (uid: string, token: string) => async (dispatch: Dispatc
 }
 
 
-export const refresh = () => async (dispatch: Dispatch) => {
-    if (localStorage.getItem('refresh')) {
+// export const refresh = () => async (dispatch: Dispatch) => {
+//     if (localStorage.getItem('refresh')) {
+//         const config = {
+//             headers: {
+//                 'Accept': 'application/json',
+//                 'Content-Type': 'application/json'
+//             }
+//         };
+
+//         const body = JSON.stringify({
+//             refresh: localStorage.getItem('refresh')
+//         });
+
+//         try {
+//             const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/jwt/refresh/`, body, config);
+            
+//             if (res.status === 200) {
+//                 dispatch({
+//                     type: REFRESH_SUCCESS,
+//                     payload: res.data
+//                 });
+//             } else {
+//                 dispatch({
+//                     type: REFRESH_FAIL
+//                 });
+//             }
+//         }catch(error){
+//             console.log(error);
+
+//             dispatch({
+//                 type: REFRESH_FAIL
+//             });
+//         }
+//     } else {        
+//         dispatch({
+//             type: REFRESH_FAIL
+//         });
+//     }
+// }
+
+
+export const reset_password = (email: string) => async (dispatch: Dispatch) => {
+    dispatch({
+        type: SET_AUTH_LOADING
+    })
+
+    const config = {
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    const body = JSON.stringify({ email })
+
+    try {
+        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/users/reset_password/`, body, config)
+
+        if (res.status === 204) {
+            dispatch({
+                type: RESET_PASSWORD_SUCCESS
+            })
+            dispatch({
+                type: REMOVE_AUTH_LOADING
+            })
+            dispatch(setALert("Password reset email sent", "green") as any)
+        }
+        else {
+            dispatch({
+                type: RESET_PASSWORD_FAIL
+            })
+            dispatch({
+                type: REMOVE_AUTH_LOADING
+            })
+            dispatch(setALert("Error sending password reset email", "red") as any)
+        }
+    }
+    catch(error){
+        console.log(error);
+        dispatch({
+            type: RESET_PASSWORD_FAIL
+        })
+        dispatch({
+            type: REMOVE_AUTH_LOADING
+        })
+        dispatch(setALert("Error sending password reset email", "red") as any)
+        
+    }
+}
+
+
+export const reset_password_confirm = (uid: string, token: string, new_password: string, re_new_password: string) =>
+    async (dispatch: Dispatch) => {
+        dispatch({
+            type: SET_AUTH_LOADING
+        })
+    
         const config = {
             headers: {
-                'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
         }
 
         const body = JSON.stringify({
-            refresh: localStorage.getItem('refresh')
+            uid,
+            token,
+            new_password,
+            re_new_password
         })
 
-        try {
-            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/users/activation/`, body, config)
-
-            if (res.status === 200) {
-                dispatch({
-                    type: REFRESH_SUCCESS,
-                    payload: res.data
-                })                
-            }
-            else {
-                dispatch({
-                    type: REFRESH_FAIL
-                })                
-            }            
-        }
-        catch (error) {
+        if (new_password !== re_new_password) {
             dispatch({
-                type: REFRESH_FAIL
+                type: RESET_PASSWORD_CONFIRM_FAIL
             })
+            dispatch({
+                type: REMOVE_AUTH_LOADING
+            })
+            dispatch(setALert("Password do not match", "red") as any)        
+        } 
+        else {
+            try {
+                const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/users/reset_password_confirm/`, body, config)
+
+                if (res.status === 204) {
+                    dispatch({
+                        type: RESET_PASSWORD_CONFIRM_SUCCESS
+                    })
+                    dispatch({
+                        type: REMOVE_AUTH_LOADING
+                    })
+                    dispatch(setALert("Password has been rest successfully", "green") as any)  
+                }
+            }
+            catch(error){
+                console.log(error);
+                dispatch({
+                    type: RESET_PASSWORD_CONFIRM_FAIL
+                })                
+                dispatch(setALert("Password reset fail", "red") as any)  
+            }
         }
+    }
 
-    }
-    else {
-        dispatch({
-            type: REFRESH_FAIL
-        })
-    }
+
+export const logout = () => (dispatch: Dispatch) => {
+    dispatch({
+        type: LOGOUT
+    })
+    dispatch(setALert('Sucessfully logged out', 'green') as any)
 }
-
