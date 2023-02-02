@@ -146,7 +146,7 @@ class ListSearchView(APIView):
 class ListRelatedView(APIView):
     permission_classes = (permissions.AllowAny, )
 
-    def get(self, request, productId, format=None):
+    def get(self, request, productId, format=None, related_products=None):
         try:
             product_id = int(productId)
         except:
@@ -209,3 +209,87 @@ class ListRelatedView(APIView):
                 status=status.HTTP_200_OK
             )
 
+
+class ListBySearchView(APIView):
+    permission_classes = (permissions.AllowAny, )
+
+    def post(self, request, format=None):
+        data = self.request.data
+
+        try:
+            category_id = int(data['category_id'])
+        except:
+            return Response(
+                {'error': 'Category Id must be an integer'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        price_range = data['price_range']
+        sort_by = data['sort_by']
+
+        if not (sort_by == 'date_created' or sort_by == 'price' or sort_by == 'sold' or sort_by == 'name'):
+            sort_by = 'date_created'
+
+        order = data['order']
+
+        if category_id == 0:
+            product_results = Product.objects.all()
+        elif not Category.objects.filter(id=category_id).exists():
+            return Response(
+                {'error': 'This category does not exist'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        else:
+            category = Category.objects.get(id=category_id)
+            if category.parent:
+                product_results = Product.objects.filter(category=category)
+            else:
+                if not Category.objects.filter(parent=category).exists():
+                    product_results = Product.objects.filter(category=category)
+                else:
+                    categories = Product.objects.filter(parent=category)
+                    filtered_categories = [category]
+
+                    for cat in categories:
+                        filtered_categories.append(cat)
+
+                    filtered_categories = tuple(filtered_categories)
+                    product_results = Product.objects.filter(
+                        category__in=filtered_categories
+                    )
+
+        if price_range == '1 - 19':
+            product_results = product_results.filter(price__gte=1)
+            product_results = product_results.filter(price__lt=20)
+        elif price_range == '20 - 39':
+            product_results = product_results.filter(price__gte=20)
+            product_results = product_results.filter(price__lt=40)
+        elif price_range == '40 - 59':
+            product_results = product_results.filter(price__gte=40)
+            product_results = product_results.filter(price__lt=60)
+        elif price_range == '60 - 79':
+            product_results = product_results.filter(price__gte=60)
+            product_results = product_results.filter(price__lt=80)
+        elif price_range == 'More than 80':
+            product_results = product_results.filter(price__gte=80)
+
+        if order == 'desc':
+            sort_by = '-' + sort_by
+            product_results = product_results.order_by(sort_by)
+        elif order == 'asc':
+            product_results = product_results.order_by(sort_by)
+        else:
+            product_results = product_results.order_by(sort_by)
+
+        product_results = ProductSerializer(product_results, many=True)
+
+        if len(product_results.data) > 0:
+            return Response(
+                {'filtered_products': product_results.data},
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(
+                {'error': 'No products found'},
+                status=status.HTTP_200_OK
+            )
