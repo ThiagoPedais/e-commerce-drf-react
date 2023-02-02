@@ -9,7 +9,7 @@ urlpatterns = [
                   path('auth/', include('djoser.urls.jwt')),
                   path('auth/', include('djoser.social.urls')),
 
-                  path('api/category', include()),
+                  path('api/category', include('apps.category.urls')),
 
                   path('admin/', admin.site.urls),
                   path('api-auth/', include('rest_framework.urls'))
