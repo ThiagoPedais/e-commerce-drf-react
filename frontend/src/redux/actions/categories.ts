@@ -14,7 +14,7 @@ export const get_categories = () => async (dispatch: Dispatch) => {
     }
 
     try {
-        const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/category/categories/`, config)
+        const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/category/categories`, config)
 
         if (res.status === 200) {
             dispatch({
