@@ -146,7 +146,7 @@ class ListSearchView(APIView):
 class ListRelatedView(APIView):
     permission_classes = (permissions.AllowAny, )
 
-    def get(self, request, productId, format=None, related_products=None):
+    def get(self, request, productId, format=None):
         try:
             product_id = int(productId)
         except:
@@ -161,7 +161,7 @@ class ListRelatedView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        category = Product.objects.get(id=product_id).catgory
+        category = Product.objects.get(id=product_id).category
 
         if Product.objects.filter(category=category).exists():
             if category.parent:
@@ -169,8 +169,8 @@ class ListRelatedView(APIView):
                     '-sold'
                 ).filter(category=category)
             else:
-                if not Category.objects.filter(parent=category).exist():
-                    related_products = related_products.order_by(
+                if not Category.objects.filter(parent=category).exists():
+                    related_products = Product.objects.order_by(
                         '-sold'
                     ).filter(category=category)
                 else:
@@ -181,7 +181,7 @@ class ListRelatedView(APIView):
                         filtered_categories.append(cat)
 
                     filtered_categories = tuple(filtered_categories)
-                    related_products = related_products.order_by(
+                    related_products = Product.objects.order_by(
                         '-sold'
                     ).filter(category__in=filtered_categories)
 
