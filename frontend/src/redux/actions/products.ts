@@ -61,7 +61,7 @@ export const get_products_by_arrival = () => async (dispatch: Dispatch) => {
     try {
         const res = await axios.get(`${URL}/get-products?sortBy=date_created&order=desc&limit=3`, config)
 
-        if (res.data === 200) {
+        if (res.status === 200) {
             dispatch({
                 type: GET_PRODUCTS_BY_ARRIVAL_SUCCESS,
                 payload: res.data
@@ -91,7 +91,7 @@ export const get_products_by_sold = () => async (dispatch: Dispatch) => {
     try {
         const res = await axios.get(`${URL}/get-products?sortBy=sold&order=desc&limit=3`, config)
 
-        if (res.data === 200) {
+        if (res.status === 200) {
             dispatch({
                 type: GET_PRODUCTS_BY_SOLD_SUCCESS,
                 payload: res.data
@@ -121,7 +121,7 @@ export const get_product = (productId: number) => async (dispatch: Dispatch) => 
     try {
         const res = await axios.get(`${URL}/product/${productId}`, config)
 
-        if (res.data === 200) {
+        if (res.status === 200) {
             dispatch({
                 type: GET_PRODUCTS_SUCCESS,
                 payload: res.data
@@ -151,7 +151,7 @@ export const get_related_products = (productId: number) => async (dispatch: Disp
     try {
         const res = await axios.get(`${URL}/related/${productId}`, config)
 
-        if (res.data === 200 && !res.data.error) {
+        if (res.status === 200 && !res.data.error) {
             dispatch({
                 type: RELATED_PRODUCTS_SUCCESS,
                 payload: res.data
@@ -190,7 +190,7 @@ export const get_filtered_products = (category_id: number, price_range: number, 
         try {
             const res = await axios.post(`${URL}/by/search`, body, config)
 
-            if (res.data === 200 && !res.data.error) {
+            if (res.status === 200 && !res.data.error) {
                 dispatch({
                     type: FILTER_PRODUCTS_SUCCESS,
                     payload: res.data
@@ -226,7 +226,7 @@ export const get_search_products = (search: string, category_id: number) => asyn
     try {
         const res = await axios.post(`${URL}/search`, body, config)
 
-        if (res.data === 200) {
+        if (res.status === 200) {
             dispatch({
                 type: SEARCH_PRODUCTS_SUCCESS,
                 payload: res.data

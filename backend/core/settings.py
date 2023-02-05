@@ -19,6 +19,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+DOMAIN = os.environ.get('DOMAIN')
+
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -225,6 +227,8 @@ DJOSER = {
 AUTH_USER_MODEL = 'user.UserAccount'
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 if not DEBUG:
     DEFAULT_FROM_EMAIL = 'Vudera - Academia de Software <mail@vudera.com>'
