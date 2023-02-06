@@ -219,8 +219,8 @@ export const get_search_products = (search: string, category_id: number) => asyn
     }
 
     const body = JSON.stringify({
-        category_id,
-        search        
+        search,
+        category_id                
     })
 
     try {

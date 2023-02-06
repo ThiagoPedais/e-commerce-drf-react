@@ -97,7 +97,7 @@ class ListSearchView(APIView):
             search_results = Product.objects.order_by('-date_created').all()
         else:
             search_results = Product.objects.filter(
-                Q(description_icontainer=search) | Q(name_icontains=search)
+                Q(description__icontains=search) | Q(name__icontains=search)
             )
 
         if category_id == 0:

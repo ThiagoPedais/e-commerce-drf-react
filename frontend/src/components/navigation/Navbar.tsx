@@ -18,6 +18,7 @@ import { Link, Navigate, NavLink } from 'react-router-dom'
 
 import { logout } from '../../redux/actions/auth'
 import { get_categories } from '../../redux/actions/categories'
+import { get_search_products } from '../../redux/actions/products'
 
 import Alert from '../../components/alert'
 import { connect } from 'react-redux'
@@ -90,13 +91,40 @@ function classNames(...classes: string[]) {
 
 
 
-function Navbar({ isAuthenticated, user, logout, get_categories, categories }: any) {
+function Navbar({ isAuthenticated, user, logout, get_categories, categories, get_search_products }: any) {
 
   const [redirect, setRedirect] = useState(true)
-  
+
+  const [render, setRender] = useState(false)
+  const [formData, setFormData] = useState({
+    category_id: 0,
+    search: ''
+  })
+  const { category_id, search } = formData
+
   useEffect(() => {
     get_categories()
   }, [])
+
+
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    get_search_products(search, category_id)
+    setRender(!render)
+  }
+
+  if (render) {
+    return <Navigate to='/search' />
+  }
+
+
 
   const logoutHandler = () => {
     logout()
@@ -233,7 +261,20 @@ function Navbar({ isAuthenticated, user, logout, get_categories, categories }: a
                 Shop
               </NavLink>
 
-              <SearchBox categories={categories} />
+              {
+                window.location.pathname === '/search'
+                  ?
+                  <></>
+                  :
+                  <SearchBox
+                    search={search}
+                    onChange={onChange}
+                    onSubmit={onSubmit}
+                    categories={categories}
+                  />
+              }
+
+
 
 
             </Popover.Group>
@@ -344,5 +385,6 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(mapStateToProps, {
   logout,
-  get_categories
+  get_categories,
+  get_search_products
 })(Navbar)
