@@ -79,7 +79,7 @@ class ListProductView(APIView):
 
 
 class ListSearchView(APIView):
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
         data = self.request.data
@@ -144,7 +144,7 @@ class ListSearchView(APIView):
 
 
 class ListRelatedView(APIView):
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request, productId, format=None):
         try:
@@ -211,7 +211,7 @@ class ListRelatedView(APIView):
 
 
 class ListBySearchView(APIView):
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
 
     def post(self, request, format=None):
         data = self.request.data

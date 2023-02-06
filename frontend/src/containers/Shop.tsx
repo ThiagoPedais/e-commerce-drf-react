@@ -15,6 +15,8 @@ import {
 
 import { connect } from 'react-redux'
 import { get_categories } from '../redux/actions/categories'
+import { get_products, get_filtered_products } from '../redux/actions/products'
+import { Link } from 'react-router-dom'
 
 
 const sortOptions = [
@@ -73,13 +75,84 @@ function classNames(...classes: any[]) {
     return classes.filter(Boolean).join(' ')
 }
 
-const Shop = ({ get_categories, categories }: any) => {
+const Shop = ({ get_categories, categories, get_products, products, get_filtered_products, filtered_products }: any) => {
 
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
+    const [filtered, setFiltered] = useState(false)
+    const [formData, setFormData] = useState({
+        category_id: '0',
+        price_range: 'Any',
+        sortBy: 'created',
+        order: 'desc'
+    })
+
+    const {
+        category_id,
+        price_range,
+        sortBy,
+        order
+    } = formData
 
     useEffect(() => {
         get_categories()
+        get_products()
+        window.scrollTo(0, 0)
     }, [])
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, [e.target.name]: e.target.value })
+
+    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        get_filtered_products(category_id, price_range, sortBy, order)
+        setFiltered(true)
+    }
+
+    const showProducts = () => {
+        let results = []
+        let display: any[] = []
+
+        if (
+            filtered_products &&
+            filtered_products !== null &&
+            filtered_products !== undefined &&
+            filtered
+        ) {
+            filtered_products.map((product: any, index: React.Key | null | undefined) => {
+                return display.push(
+                    <div key={index}>
+                        product
+                    </div>
+                )
+            })
+        }
+        else if (
+            !filtered &&
+            products !== null &&
+            products !== undefined             
+        ) {
+            products.map((product: any, index: React.Key | null | undefined) => {
+                return display.push(
+                    <div key={index}>
+                        product
+                    </div>
+                )
+            })
+        }
+
+        for (let i = 0; i < display.length; i += 3) {
+            results.push(
+                <div key={i} className="grid md:grid-cols-3">
+                    {display[i] ? display[i] : <div className=''></div>}
+                    {display[i+1] ? display[i+1] : <div className=''>dsfsd</div>}
+                    {display[i+2] ? display[i+2] : <div className=''></div>}
+                </div>
+            )
+        }
+
+        return results
+
+    }
+
 
 
     return (
@@ -164,8 +237,8 @@ const Shop = ({ get_categories, categories }: any) => {
                                                                 </label>
                                                             </div>
                                                         )
-                                                        
-                                                        if (Array.isArray(category.sub_categories)){
+
+                                                        if (Array.isArray(category.sub_categories)) {
                                                             category.sub_categories.map((sub_category: any) => {
                                                                 result.push(
                                                                     <div key={sub_category.id} className='flex items-center h-5 ml-2 my-5'>
@@ -308,64 +381,64 @@ const Shop = ({ get_categories, categories }: any) => {
                                 <form className="hidden lg:block">
                                     <h3 className="sr-only">Categories</h3>
                                     <ul role="list" className="text-sm font-medium text-gray-900 space-y-4 pb-6 border-b border-gray-200">
-                                    {
-                                                categories &&
-                                                categories !== null &&
-                                                categories !== undefined &&
-                                                categories.map((category: {
-                                                    name: ReactNode
-                                                    id: Key
-                                                    sub_categories: string | string[]
-                                                }) => {
-                                                    if (category.sub_categories.length === 0) {
-                                                        return (
-                                                            <div key={category.id} className='flex items-center h-5 my-5'>
-                                                                <input
-                                                                    type="radio"
-                                                                    name='category_id'
-                                                                    className='focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray rounded-full'
-                                                                />
-                                                                <label htmlFor="" className="ml-3 min-w-0 flex-1 text-gray-500">
-                                                                    {category.name}
-                                                                </label>
-                                                            </div>
-                                                        )
+                                        {
+                                            categories &&
+                                            categories !== null &&
+                                            categories !== undefined &&
+                                            categories.map((category: {
+                                                name: ReactNode
+                                                id: Key
+                                                sub_categories: string | string[]
+                                            }) => {
+                                                if (category.sub_categories.length === 0) {
+                                                    return (
+                                                        <div key={category.id} className='flex items-center h-5 my-5'>
+                                                            <input
+                                                                type="radio"
+                                                                name='category_id'
+                                                                className='focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray rounded-full'
+                                                            />
+                                                            <label htmlFor="" className="ml-3 min-w-0 flex-1 text-gray-500">
+                                                                {category.name}
+                                                            </label>
+                                                        </div>
+                                                    )
+                                                }
+                                                else {
+                                                    let result = []
+                                                    result.push(
+                                                        <div key={category.id} className='flex items-center h-5 my-5'>
+                                                            <input
+                                                                type="radio"
+                                                                name='category_id'
+                                                                className='focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray rounded-full'
+                                                            />
+                                                            <label htmlFor="" className="ml-3 min-w-0 flex-1 text-gray-500">
+                                                                {category.name}
+                                                            </label>
+                                                        </div>
+                                                    )
+
+                                                    if (Array.isArray(category.sub_categories)) {
+                                                        category.sub_categories.map((sub_category: any) => {
+                                                            result.push(
+                                                                <div key={sub_category.id} className='flex items-center h-5 ml-2 my-5'>
+                                                                    <input
+                                                                        type="radio"
+                                                                        name='category_id'
+                                                                        className='focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray rounded-full'
+                                                                    />
+                                                                    <label htmlFor="" className="ml-3 min-w-0 flex-1 text-gray-500">
+                                                                        {sub_category.name}
+                                                                    </label>
+                                                                </div>
+                                                            )
+                                                        })
                                                     }
-                                                    else {
-                                                        let result = []
-                                                        result.push(
-                                                            <div key={category.id} className='flex items-center h-5 my-5'>
-                                                                <input
-                                                                    type="radio"
-                                                                    name='category_id'
-                                                                    className='focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray rounded-full'
-                                                                />
-                                                                <label htmlFor="" className="ml-3 min-w-0 flex-1 text-gray-500">
-                                                                    {category.name}
-                                                                </label>
-                                                            </div>
-                                                        )
-                                                        
-                                                        if (Array.isArray(category.sub_categories)){
-                                                            category.sub_categories.map((sub_category: any) => {
-                                                                result.push(
-                                                                    <div key={sub_category.id} className='flex items-center h-5 ml-2 my-5'>
-                                                                        <input
-                                                                            type="radio"
-                                                                            name='category_id'
-                                                                            className='focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray rounded-full'
-                                                                        />
-                                                                        <label htmlFor="" className="ml-3 min-w-0 flex-1 text-gray-500">
-                                                                            {sub_category.name}
-                                                                        </label>
-                                                                    </div>
-                                                                )
-                                                            })
-                                                        }
-                                                        return result
-                                                    }
-                                                })
-                                            }
+                                                    return result
+                                                }
+                                            })
+                                        }
                                     </ul>
 
                                     {filters.map((section) => (
@@ -415,8 +488,43 @@ const Shop = ({ get_categories, categories }: any) => {
                                 {/* Product grid */}
                                 <div className="lg:col-span-3">
                                     {/* Replace with your content */}
-                                    <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 lg:h-full" />
-                                    {/* /End replace */}
+                                    {products && showProducts()}
+                                    {/* <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 lg:h-full" />
+                                    <div className="bg-white">
+                                        <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
+                                            <h2 className="text-2xl font-extrabold tracking-tight text-gray-900">Customers also purchased</h2>
+
+                                            <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
+                                                {
+                                                products &&
+                                                products !== null &&
+                                                products !== undefined &&
+                                                products.map((product: { id: React.Key, photo: string, imageAlt: string, href: string, name: string, price: number }) => (
+                                                    <div key={product.id} className="group relative">
+                                                        <div className="w-full min-h-80 bg-gray-200 aspect-w-1 aspect-h-1 rounded-md overflow-hidden group-hover:opacity-75 lg:h-80 lg:aspect-none">
+                                                            <img
+                                                                src={product.photo}
+                                                                alt={product.imageAlt}
+                                                                className="w-full h-full object-center object-cover lg:w-full lg:h-full"
+                                                            />
+                                                        </div>
+                                                        <div className="mt-4 flex justify-between">
+                                                            <div>
+                                                                <h3 className="text-sm text-gray-700">
+                                                                    <Link to={`product/${product.id}`}>
+                                                                        <span aria-hidden="true" className="absolute inset-0" />
+                                                                        {product.name}
+                                                                    </Link>
+                                                                </h3>
+                                                            </div>
+                                                            <p className="text-sm font-medium text-gray-900">{product.price}</p>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+
+                                        </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </section>
@@ -428,9 +536,13 @@ const Shop = ({ get_categories, categories }: any) => {
 }
 
 const mapStateToProps = (state: any) => ({
-    categories: state.Categories.categories
+    categories: state.Categories.categories,
+    products: state.Products.products,
+    filtered_products: state.Products.filtered_products
 })
 
 export default connect(mapStateToProps, {
-    get_categories
+    get_categories,
+    get_products,
+    get_filtered_products
 })(Shop)

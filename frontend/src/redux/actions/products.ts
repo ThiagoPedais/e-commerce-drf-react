@@ -123,19 +123,19 @@ export const get_product = (productId: number) => async (dispatch: Dispatch) => 
 
         if (res.status === 200) {
             dispatch({
-                type: GET_PRODUCTS_SUCCESS,
+                type: GET_PRODUCT_SUCCESS,
                 payload: res.data
             })
         }
         else {
             dispatch({
-                type: GET_PRODUCTS_FAIL
+                type: GET_PRODUCT_FAIL
             })
         }
     } catch (error) {
         console.log(error);
         dispatch({
-            type: GET_PRODUCTS_FAIL
+            type: GET_PRODUCT_FAIL
         })
     }
 }
@@ -171,7 +171,7 @@ export const get_related_products = (productId: number) => async (dispatch: Disp
 }
 
 
-export const get_filtered_products = (category_id: number, price_range: number, sort_by: string, order: string) =>
+export const get_filtered_products = (category_id: string | number, price_range: string | number, sort_by: string, order: string) =>
     async (dispatch: Dispatch) => {
         const config = {
             headers: {

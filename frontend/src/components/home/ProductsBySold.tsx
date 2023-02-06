@@ -43,7 +43,7 @@ export default function ProductBySold({ data }: any) {
                                     />
                                 </div>
                                 <h3 className="mt-4 text-base font-semibold text-gray-900">
-                                    <Link to="/">
+                                    <Link to={`product/${product.id}`}>
                                         <span className="absolute inset-0" />
                                         {product.name}
                                     </Link>
