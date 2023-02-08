@@ -5,7 +5,7 @@ from .views import UpdateItemView, RemoveItemView, EmptyCartView, SyncCartView
 
 urlpatterns = [
     path('cart-items', GetItemsView.as_view()),
-    path('add-items', AddItemView.as_view()),
+    path('add-item', AddItemView.as_view()),
     path('get-total', GetTotalView.as_view()),
     path('get-item-total', GetItemTotalView.as_view()),
     path('update-item', UpdateItemView.as_view()),

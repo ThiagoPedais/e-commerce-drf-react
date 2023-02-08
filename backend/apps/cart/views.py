@@ -77,7 +77,7 @@ class AddItemView(APIView):
                 if CartItem.objects.filter(cart=cart, product=product).exists():
                     total_items = int(cart.total_items) + 1
 
-                    Cart.objects.filter(ser=user).update(
+                    Cart.objects.filter(user=user).update(
                         total_items=total_items
                     )
 
@@ -100,19 +100,19 @@ class AddItemView(APIView):
                     )
                 else:
                     return Response(
-                        {'error', 'Not enough of this item in stock'},
+                        {'error': 'Not enough of this item in stock'},
                         status=status.HTTP_200_OK
                     )
         except:
             return Response(
-                {'error', 'Something went wrong when adding item to cart'},
+                {'error': 'Something went wrong when adding item to cart'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
 class GetTotalView(APIView):
     def get(self, request, format=None):
-        user = self.reqeust.user
+        user = self.request.user
 
         try:
             cart = Cart.objects.get(user=user)
@@ -124,7 +124,7 @@ class GetTotalView(APIView):
             if cart_items.exists():
                 for cart_item in cart_items:
                     total_cost += (float(cart_item.product.price) * float(cart_item.count))
-                    total_compare_cost += (float(cart_item.product.comapre_price) * float(cart_item.count))
+                    total_compare_cost += (float(cart_item.product.compare_price) * float(cart_item.count))
                 total_cost = round(total_cost, 2)
                 total_compare_cost = round(total_compare_cost, 2)
             return Response(
@@ -133,7 +133,7 @@ class GetTotalView(APIView):
             )
         except:
             return Response(
-                {'error': 'Somenthing went wrong when retrieving total costs'},
+                {'error': 'Something went wrong when retrieving total costs'},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
