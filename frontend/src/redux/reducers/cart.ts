@@ -1,4 +1,3 @@
-import { VariableIcon } from '@heroicons/react/24/outline';
 import { AnyAction } from 'redux';
 import {
     ADD_ITEM,
@@ -38,142 +37,141 @@ export default function Cart(state = initialState, action: AnyAction) {
     const { type, payload } = action;
     const storedCart = localStorage.getItem('cart')
 
-    
-        switch (type) {
-            case ADD_ITEM_SUCCESS:
-                return {
-                    ...state,
-                    items: payload.cart
-                };
-            case ADD_ITEM_FAIL:
-                return {
-                    ...state,
-                    items: null
-                };
-/******************************************************************** */
+    switch (type) {        
+        case ADD_ITEM_SUCCESS:
+            return {
+                ...state,
+                items: payload.cart
+            };
+        case ADD_ITEM_FAIL:
+            return {
+                ...state,
+                items: null
+            };
+        /******************************************************************** */
 
-            case ADD_ITEM:
-                localStorage.setItem('cart', JSON.stringify(payload));
-                return {
-                    ...state,
-                    items: JSON.parse(storedCart)
-                };                
-/******************************************************************** */
+        case ADD_ITEM:
+            localStorage.setItem('cart', JSON.stringify(payload));
+            return {
+                ...state,
+                items: JSON.parse(storedCart)
+            };
+        /******************************************************************** */
 
-            case GET_ITEMS_SUCCESS:
-                return {
-                    ...state,
-                    items: payload.cart
-                };
-            case GET_ITEMS_FAIL:
-                return {
-                    ...state,
-                    items: null
-                };
-/******************************************************************** */
+        case GET_ITEMS_SUCCESS:
+            return {
+                ...state,
+                items: payload.cart
+            };
+        case GET_ITEMS_FAIL:
+            return {
+                ...state,
+                items: null
+            };
+        /******************************************************************** */
 
-            case GET_ITEMS:
-                return {
-                    ...state,
-                    items: JSON.parse(storedCart)
-                };
-/******************************************************************** */
+        case GET_ITEMS:
+            return {
+                ...state,
+                items: JSON.parse(storedCart)
+            };
+        /******************************************************************** */
 
-            case GET_TOTAL_SUCCESS:
-                return {
-                    ...state,
-                    amount: payload.total_cost,
-                    compare_amount: payload.total_compare_cost
-                };
-            case GET_TOTAL_FAIL:
-                return {
-                    ...state,
-                    amount: 0.00,
-                    compare_amount: 0.00
-                };
-/******************************************************************** */
+        case GET_TOTAL_SUCCESS:
+            return {
+                ...state,
+                amount: payload.total_cost,
+                compare_amount: payload.total_compare_cost
+            };
+        case GET_TOTAL_FAIL:
+            return {
+                ...state,
+                amount: 0.00,
+                compare_amount: 0.00
+            };
+        /******************************************************************** */
 
-            case GET_TOTAL:
-                return {
-                    ...state,
-                    amount: payload[0],
-                    compare_amount: payload[1]
-                };
-/******************************************************************** */
+        case GET_TOTAL:
+            return {
+                ...state,
+                amount: payload[0],
+                compare_amount: payload[1]
+            };
+        /******************************************************************** */
 
-            case GET_ITEM_TOTAL_SUCCESS:
-                return {
-                    ...state,
-                    total_items: payload.total_items
-                };
-            case GET_ITEM_TOTAL_FAIL:
-                return {
-                    ...state,
-                    total_items: 0
-                };
-/******************************************************************** */
+        case GET_ITEM_TOTAL_SUCCESS:
+            return {
+                ...state,
+                total_items: payload.total_items
+            };
+        case GET_ITEM_TOTAL_FAIL:
+            return {
+                ...state,
+                total_items: 0
+            };
+        /******************************************************************** */
 
-            case GET_ITEM_TOTAL:
-                return {
-                    ...state,
-                    total_items: payload
-                };
- /******************************************************************** */
+        case GET_ITEM_TOTAL:
+            return {
+                ...state,
+                total_items: payload
+            };
+        /******************************************************************** */
 
-            case UPDATE_ITEM_SUCCESS:
-                return {
-                    ...state,
-                    items: payload.cart
-                };
-            case UPDATE_ITEM_FAIL:
-                return {
-                    ...state
-                };
-            case UPDATE_ITEM:
-                localStorage.setItem('cart', JSON.stringify(payload));
-                return {
-                    ...state,
-                    items: JSON.parse(storedCart)
-                };
-            case REMOVE_ITEM_SUCCESS:
-                return {
-                    ...state,
-                    items: payload.cart
-                };
-            case REMOVE_ITEM_FAIL:
-                return {
-                    ...state
-                };
-            case REMOVE_ITEM:
-                localStorage.setItem('cart', JSON.stringify(payload));
-                return {
-                    ...state,
-                    items: JSON.parse(storedCart)
-                };
-            case EMPTY_CART_SUCCESS:
-            case EMPTY_CART_FAIL:
-                return {
-                    ...state,
-                    items: null,
-                    amount: 0.00,
-                    compare_amount: 0.00,
-                    total_items: 0
-                };
-            case EMPTY_CART:
-                localStorage.removeItem('cart');
-                return {
-                    items: null,
-                    amount: 0.00,
-                    compare_amount: 0.00,
-                    total_items: 0
-                };
-            case SYNCH_CART_SUCCESS:
-            case SYNCH_CART_FAIL:
-                localStorage.removeItem('cart');
-                return {
-                    ...state
-                };
-            default:
-                return state;
-        }
+        case UPDATE_ITEM_SUCCESS:
+            return {
+                ...state,
+                items: payload.cart
+            };
+        case UPDATE_ITEM_FAIL:
+            return {
+                ...state
+            };
+        case UPDATE_ITEM:
+            localStorage.setItem('cart', JSON.stringify(payload));
+            return {
+                ...state,
+                items: JSON.parse(storedCart)
+            };
+        case REMOVE_ITEM_SUCCESS:
+            return {
+                ...state,
+                items: payload.cart
+            };
+        case REMOVE_ITEM_FAIL:
+            return {
+                ...state
+            };
+        case REMOVE_ITEM:
+            localStorage.setItem('cart', JSON.stringify(payload));
+            return {
+                ...state,
+                items: JSON.parse(storedCart)
+            };
+        case EMPTY_CART_SUCCESS:
+        case EMPTY_CART_FAIL:
+            return {
+                ...state,
+                items: null,
+                amount: 0.00,
+                compare_amount: 0.00,
+                total_items: 0
+            };
+        case EMPTY_CART:
+            localStorage.removeItem('cart');
+            return {
+                items: null,
+                amount: 0.00,
+                compare_amount: 0.00,
+                total_items: 0
+            };
+        case SYNCH_CART_SUCCESS:
+        case SYNCH_CART_FAIL:
+            localStorage.removeItem('cart');
+            return {
+                ...state
+            };
+        default:
+            return state;
     }
+}

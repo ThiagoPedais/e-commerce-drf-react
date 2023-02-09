@@ -1,66 +1,52 @@
-import { JSXElementConstructor, Key, ReactElement, ReactFragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import Layout from '../../hocs/Layout'
-import { Disclosure, RadioGroup, Tab } from '@headlessui/react'
-import { StarIcon } from '@heroicons/react/24/outline'
-import { PlusSmallIcon } from '@heroicons/react/24/outline'
 import { HeartIcon, MinusSmallIcon } from '@heroicons/react/20/solid'
+import { Oval } from 'react-loader-spinner'
+
 import {
     get_product,
     get_related_products
 } from '../../redux/actions/products'
+import {
+    get_item,
+    add_item,
+    get_total,
+    get_item_total
+} from '../../redux/actions/cart'
+
 import ImageGalery from '../../components/product/ImageGalery'
 
 
 
-const product = {
-    name: 'Zip Tote Basket',
-    price: '$140',
-    rating: 4,
-    images: [
-        {
-            id: 1,
-            name: 'Angled view',
-            src: 'https://tailwindui.com/img/ecommerce-images/product-page-03-product-01.jpg',
-            alt: 'Angled front view with bag zipped and handles upright.',
-        },
-        // More images...
-    ],
-    colors: [
-        { name: 'Washed Black', bgColor: 'bg-gray-700', selectedColor: 'ring-gray-700' },
-        { name: 'White', bgColor: 'bg-white', selectedColor: 'ring-gray-400' },
-        { name: 'Washed Gray', bgColor: 'bg-gray-500', selectedColor: 'ring-gray-500' },
-    ],
-    description: `
-      <p>The Zip Tote Basket is the perfect midpoint between shopping tote and comfy backpack. With convertible straps, you can hand carry, should sling, or backpack this convenient and spacious bag. The zip top and durable canvas construction keeps your goods protected for all-day use.</p>
-    `,
-    details: [
-        {
-            name: 'Features',
-            items: [
-                'Multiple strap configurations',
-                'Spacious interior with top zip',
-                'Leather handle and tabs',
-                'Interior dividers',
-                'Stainless strap loops',
-                'Double stitched construction',
-                'Water-resistant',
-            ],
-        },
-        // More sections...
-    ],
-}
 
-function classNames(...classes: any[]) {
-    return classes.filter(Boolean).join(' ')
-}
+const ProductDetail = ({
+    get_product,
+    get_related_products,
+    product,
+    get_item,
+    add_item,
+    get_total,
+    get_item_total }: any) => {
 
 
+    const [loading, setLoading] = useState(false)
 
-const ProductDetail = ({ get_product, get_related_products, product }: any) => {
+    const navigate = useNavigate()
 
-    const [selectedColor, setSelectedColor] = useState('ring-gray-500')
+    const addToCart = async () => {
+        if (product && product !== null && product !== undefined && product.quantity > 0) {
+            setLoading(true)
+            await add_item(product)
+            await get_item()
+            await get_total()
+            await get_item_total()
+            setLoading(false)
+            navigate('/cart')
+        }
+    }
+
     const params = useParams()
     const productId = params.productId
 
@@ -135,18 +121,48 @@ const ProductDetail = ({ get_product, get_related_products, product }: any) => {
                                 </div>
                             </div>
 
-                            
-
-
-                            <form className="mt-6">
-
-                                <div className="mt-10 flex sm:flex-col1">
-                                    <button
-                                        type="submit"
-                                        className="max-w-xs flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 sm:w-full"
-                                    >
-                                        Add to bag
-                                    </button>
+                            <div className="mt-6">
+                                <p className='mt-4'>
+                                    {
+                                        product && product !== null && product !== undefined && product.quantity > 0
+                                            ?
+                                            (
+                                                <span className='text-green-500'>
+                                                    In Stock
+                                                </span>
+                                            )
+                                            :
+                                            (
+                                                <span className='text-red-500'>
+                                                    Out of Stock
+                                                </span>
+                                            )
+                                    }
+                                </p>
+                                <div className="mt-4 flex sm:flex-col1">
+                                    {
+                                        loading
+                                            ?
+                                            <button
+                                                onClick={addToCart}
+                                                type="submit"
+                                                className="max-w-xs flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 sm:w-full"
+                                            >
+                                                <Oval
+                                                    width={20}
+                                                    height={20}
+                                                    color='#FFF'
+                                                />
+                                            </button>
+                                            :
+                                            <button
+                                                onClick={addToCart}
+                                                type="submit"
+                                                className="max-w-xs flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500 sm:w-full"
+                                            >
+                                                Add to cart
+                                            </button>
+                                    }
 
                                     <button
                                         type="button"
@@ -156,7 +172,7 @@ const ProductDetail = ({ get_product, get_related_products, product }: any) => {
                                         <span className="sr-only">Add to favorites</span>
                                     </button>
                                 </div>
-                            </form>
+                            </div>
 
                             <section aria-labelledby="details-heading" className="mt-12">
                                 <h2 id="details-heading" className="sr-only">
@@ -179,5 +195,9 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(mapStateToProps, {
     get_product,
-    get_related_products
+    get_related_products,
+    get_item,
+    add_item,
+    get_total,
+    get_item_total
 })(ProductDetail)

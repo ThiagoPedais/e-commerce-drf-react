@@ -14,6 +14,7 @@ import {
   Squares2X2Icon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
+import { ShoppingCartIcon } from '@heroicons/react/20/solid'
 import { Link, Navigate, NavLink } from 'react-router-dom'
 
 import { logout } from '../../redux/actions/auth'
@@ -91,7 +92,7 @@ function classNames(...classes: string[]) {
 
 
 
-function Navbar({ isAuthenticated, user, logout, get_categories, categories, get_search_products }: any) {
+function Navbar({ isAuthenticated, user, logout, get_categories, categories, get_search_products, total_items}: any) {
 
   const [redirect, setRedirect] = useState(true)
 
@@ -249,12 +250,18 @@ function Navbar({ isAuthenticated, user, logout, get_categories, categories, get
               </Link>
 
             </div>
+
             <div className="-my-2 -mr-2 md:hidden">
+              <Link to='/cart' className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                <span className="sr-only">Open menu</span>
+                <ShoppingCartIcon className="h-6 w-6" aria-hidden="true" />
+              </Link>
               <Popover.Button className="inline-flex items-center justify-center rounded-md bg-white p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
                 <span className="sr-only">Open menu</span>
                 <Bars3Icon className="h-6 w-6" aria-hidden="true" />
               </Popover.Button>
             </div>
+
             <Popover.Group as="nav" className="hidden space-x-10 md:flex">
 
               <NavLink to="/shop" className="mt-2 text-base font-medium text-gray-500 hover:text-gray-900">
@@ -280,13 +287,22 @@ function Navbar({ isAuthenticated, user, logout, get_categories, categories, get
             </Popover.Group>
             <div className="hidden items-center justify-end md:flex md:flex-1 lg:w-0">
 
-              {
-                isAuthenticated
-                  ?
-                  authLinks
-                  :
-                  guestLinks
-              }
+              <div className="flex items-center md:ml-12">
+                <Link to='/cart'>
+                  <ShoppingCartIcon className='h-7 w-7 text-gray-400 mr-4 cursor-pointer' />
+                  <span className="text-xs absolute top-1 mt-3 ml-4 bg-red-500 text-white font-semibold rounded-full px-2 text-center">
+                    {/* {total_items} */}
+                    {total_items}
+                  </span>
+                </Link>
+                {
+                  isAuthenticated
+                    ?
+                    authLinks
+                    :
+                    guestLinks
+                }
+              </div>
 
             </div>
           </div>
@@ -380,11 +396,13 @@ function Navbar({ isAuthenticated, user, logout, get_categories, categories, get
 const mapStateToProps = (state: any) => ({
   isAuthenticated: state.Auth.isAuthenticated,
   user: state.Auth.user,
-  categories: state.Categories.categories
+  categories: state.Categories.categories,
+  total_items: state.Cart.total_items
 })
 
 export default connect(mapStateToProps, {
   logout,
   get_categories,
-  get_search_products
+  get_search_products,  
+
 })(Navbar)

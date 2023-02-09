@@ -47,7 +47,7 @@ function classNames(...classes: any[]) {
 
 const ImageGalery = ({ photo }: any) => {
 
-    console.log(photo);
+    // console.log(photo);
 
     return (
         <>

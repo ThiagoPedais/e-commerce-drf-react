@@ -13,6 +13,7 @@ import ResetPasswordConfirm from './containers/auth/ResetPasswordConfirm'
 import Shop from './containers/Shop'
 import ProductDetail from './containers/pages/ProductDetail'
 import Search from './containers/pages/Search'
+import Cart from './containers/pages/Cart'
 
 
 
@@ -26,6 +27,8 @@ function App() {
           <Route  path="*" element={<Error404 />} />
 
           <Route  path="/" element={<Home />} />
+          <Route  path="/cart" element={<Cart />} />
+
 
           {/* Authentication */}
           <Route path='/signup' element={<Signup />} />
