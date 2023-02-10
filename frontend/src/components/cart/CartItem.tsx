@@ -113,8 +113,7 @@ const CartItem = ({
                 <option>8</option>
               </select>
               <button type="submit" className="-m-2 p-2 inline-flex text-gray-400 hover:text-gray-500">
-                <span className="mx-2">Update</span>
-                
+                <span className="mx-2">Update</span>                
               </button>
             </form>
 

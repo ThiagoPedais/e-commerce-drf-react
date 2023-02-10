@@ -132,6 +132,7 @@ function Navbar({ isAuthenticated, user, logout, get_categories, categories, get
   }
 
   if (!redirect)
+    // window.location.reload()
     return <Navigate to='/' />;
 
   const authLinks = (

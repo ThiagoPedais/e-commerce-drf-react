@@ -1,81 +1,98 @@
-import { Key, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import CartItem from '../../components/cart/CartItem'
+import { Navigate } from 'react-router-dom';
 import Layout from '../../hocs/Layout'
-import {
-    remove_item,
-    update_item,
-    get_item,
-    get_total,
-    get_item_total
-} from '../../redux/actions/cart'
-
-import { CheckIcon, ClockIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
-import { XMarkIcon } from '@heroicons/react/24/outline'
-import { setALert } from '../../redux/actions/alert'
+import { CheckIcon, ClockIcon, QuestionMarkCircleIcon, XMarkIcon } from '@heroicons/react/20/solid'
+import { update_item, remove_item } from '../../redux/actions/cart';
+import CartItem from '../../components/cart/CartItem';
+import { setALert } from '../../redux/actions/alert';
+import { get_shipping_options } from '../../redux/actions/shipping';
 
 
 
-const products = [
-    {
-        id: 1,
-        name: 'Basic Tee',
-        href: '#',
-        price: '$32.00',
-        color: 'Sienna',
-        inStock: true,
-        size: 'Large',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-01.jpg',
-        imageAlt: "Front of men's Basic Tee in sienna.",
-    },
-    {
-        id: 2,
-        name: 'Basic Tee',
-        href: '#',
-        price: '$32.00',
-        color: 'Black',
-        inStock: false,
-        leadTime: '3–4 weeks',
-        size: 'Large',
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-02.jpg',
-        imageAlt: "Front of men's Basic Tee in black.",
-    },
-    {
-        id: 3,
-        name: 'Nomad Tumbler',
-        href: '#',
-        price: '$35.00',
-        color: 'White',
-        inStock: true,
-        imageSrc: 'https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-03.jpg',
-        imageAlt: 'Insulated bottle with white base and black snap lid.',
-    },
-]
 
-
-const Cart = ({
-    get_item,
-    get_total,
-    get_item_total,
+const CheckOut = ({
     isAuthenticated,
     items,
-    amount,
-    compare_amount,
-    total_items,
+    update_item,
     remove_item,
-    update_item
-}: any) => {
+    setALert,
+    get_shipping_options,
+    shipping }: any) => {
 
-    const [render, setRender] = useState(false)
+
+    const [formData, setFormData] = useState({
+        full_name: '',
+        address_line_1: '',
+        address_line_2: '',
+        city: '',
+        state_province_region: '',
+        postal_zip_code: 'Brazil',
+        phone_number: '',
+        coupon_name: '',
+        shipping_id: 0
+    })
+
+    const {
+        full_name,
+        address_line_1,
+        address_line_2,
+        city,
+        state_province_region,
+        postal_zip_code,
+        phone_number,
+        coupon_name,
+        shipping_id
+    } = formData
+
+    const [data, setData] = useState({
+        instance: {}
+    })
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+          ...formData,
+          [e.target.name]: e.target.value
+        })
+      }
+    
+      const renderShipping = () => {
+        if (shipping && shipping !== null && shipping !== undefined) {
+            return (
+                <div className='mb-5'>
+                    {
+                        shipping.map((shipping_option: { id: number, name: string, price: number, time_to_delivery: string | number }, index: React.Key | null | undefined) => (
+                            <div key={index}>
+                                <input
+                                    onChange={e => onChange(e)}
+                                    value={shipping_option.id}
+                                    name='shipping_id'
+                                    type='radio'
+                                    required
+                                />
+                                <label className='ml-4'>
+                                    {shipping_option.name} - ${shipping_option.price} ({shipping_option.time_to_delivery})
+                                </label>
+                            </div>
+                        ))
+                    }
+                </div>
+            );
+        }
+    };
+
+
 
     useEffect(() => {
         window.scrollTo(0, 0)
-        get_item()
-        get_total()
-        get_item_total()
-    }, [render])
+        get_shipping_options()
+    }, [])
 
+    const [render, setRender] = useState(false)
+
+    if (!isAuthenticated) {
+        return <Navigate to='/' />;
+    }
 
     const showItems = () => {
         return (
@@ -85,7 +102,7 @@ const Cart = ({
                     items !== null &&
                     items !== undefined &&
                     items.length !== 0 &&
-                    items.map((item: { count: any }, index: Key | null | undefined) => {
+                    items.map((item: { count: any }, index: null | undefined) => {
                         let count = item.count
                         return (
                             <div key={index}>
@@ -106,58 +123,14 @@ const Cart = ({
         )
     }
 
-    const checkoutButton = () => {
-        if (total_items < 1) {
-            return (
-                <>
-                    <Link
-                        to='/shop'
-
-                    >
-                        <button
-                            className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-                        >
-                            Search items to buy
-                        </button>
-                    </Link>
-                </>
-            )
-        } else if (!isAuthenticated) {
-            return (<>
-                <Link
-                    to='/login'
-                >
-                    <button
-                        className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-                    >
-                        Login
-                    </button>
-                </Link>
-            </>)
-
-        } else {
-            return (
-                <>
-                    <Link
-                        to='/checkout'>
-                        <button
-                            className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
-                        >
-                            Checkout
-                        </button>
-                    </Link>
-                </>
-            )
-
-        }
-    }
-
 
     return (
         <Layout>
             <div className="bg-white">
                 <div className="max-w-2xl mx-auto pt-16 pb-24 px-4 sm:px-6 lg:max-w-7xl lg:px-8">
-                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Shopping Cart Items ({total_items}) </h1>
+                    <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                        Checkout
+                    </h1>
                     <div className="mt-12 lg:grid lg:grid-cols-12 lg:gap-x-12 lg:items-start xl:gap-x-16">
                         <section aria-labelledby="cart-heading" className="lg:col-span-7">
                             <h2 id="cart-heading" className="sr-only">
@@ -181,13 +154,9 @@ const Cart = ({
                             </h2>
 
                             <dl className="mt-6 space-y-4">
-
                                 <div className="flex items-center justify-between">
-                                    <dt className="text-sm text-gray-600">Subtotal</dt>
-                                    <dd className="text-sm font-medium text-gray-900">${compare_amount.toFixed(2)}</dd>
+                                    { renderShipping() }
                                 </div>
-
-
                                 <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
                                     <dt className="flex items-center text-sm text-gray-600">
                                         <span>Shipping estimate</span>
@@ -198,7 +167,6 @@ const Cart = ({
                                     </dt>
                                     <dd className="text-sm font-medium text-gray-900">$5.00</dd>
                                 </div>
-
                                 <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
                                     <dt className="flex text-sm text-gray-600">
                                         <span>Tax estimate</span>
@@ -209,15 +177,19 @@ const Cart = ({
                                     </dt>
                                     <dd className="text-sm font-medium text-gray-900">$8.32</dd>
                                 </div>
-
                                 <div className="border-t border-gray-200 pt-4 flex items-center justify-between">
                                     <dt className="text-base font-medium text-gray-900">Order total</dt>
-                                    <dd className="text-base font-medium text-gray-900">${amount.toFixed(2)}</dd>
+                                    <dd className="text-base font-medium text-gray-900">$112.32</dd>
                                 </div>
                             </dl>
 
                             <div className="mt-6">
-                                {checkoutButton()}
+                                <button
+                                    type="submit"
+                                    className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                                >
+                                    Checkout
+                                </button>
                             </div>
                         </section>
                     </div>
@@ -229,16 +201,14 @@ const Cart = ({
 
 const mapStateToProps = (state: any) => ({
     isAuthenticated: state.Auth.isAuthenticated,
+    // total_items: state.Cart.total_items,
     items: state.Cart.items,
-    amount: state.Cart.amount,
-    compare_amount: state.Cart.compare_amount,
-    total_items: state.Cart.total_items,
+    shipping: state.Shipping.shipping
 })
 
 export default connect(mapStateToProps, {
-    get_item,
-    get_total,
-    get_item_total,
+    update_item,
     remove_item,
-    update_item
-})(Cart)
+    setALert,
+    get_shipping_options
+})(CheckOut)

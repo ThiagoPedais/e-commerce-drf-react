@@ -14,6 +14,8 @@ import Shop from './containers/Shop'
 import ProductDetail from './containers/pages/ProductDetail'
 import Search from './containers/pages/Search'
 import Cart from './containers/pages/Cart'
+import CheckOut from './containers/pages/CheckOut'
+import PrivateRoute from './hocs/PrivateRoute'
 
 
 
@@ -28,6 +30,7 @@ function App() {
 
           <Route  path="/" element={<Home />} />
           <Route  path="/cart" element={<Cart />} />
+          <Route  path="/checkout" element={<PrivateRoute outlet={<CheckOut />} />} />
 
 
           {/* Authentication */}
