@@ -1,9 +1,15 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { connect } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import Layout from '../../hocs/Layout'
+import { reset } from '../../redux/actions/payment';
 
-const ThankYou = ({isAuthenticated}: any) => {
+const ThankYou = ({isAuthenticated,reset}: any) => {
+
+
+    useEffect(() => {
+        reset()
+    },[])
 
     if (!isAuthenticated) {
         return <Navigate to='/' />;
@@ -29,4 +35,6 @@ const mapStateToProps = (state: any) => ({
     isAuthenticated: state.Auth.isAuthenticated    
 })
 
-export default connect(mapStateToProps,{}) (ThankYou)
+export default connect(mapStateToProps,{
+    reset
+}) (ThankYou)

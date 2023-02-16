@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import Layout from '../../hocs/Layout'
 import { QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { update_item, remove_item } from '../../redux/actions/cart';
@@ -78,10 +78,6 @@ const CheckOut = ({
         })
     }
 
-
-
-
-
     useEffect(() => {
         window.scrollTo(0, 0)
         get_shipping_options()
@@ -95,6 +91,8 @@ const CheckOut = ({
         get_payment_total(shipping_id, '')
     }, [shipping_id])
 
+
+    
     const [render, setRender] = useState(false)
 
     if (!isAuthenticated) {
@@ -157,6 +155,26 @@ const CheckOut = ({
 
     const renderPaymentInfo = () => {
         if (!clientToken) {
+            if (!isAuthenticated) {
+                <Link
+                    to='/login'
+                    className="w-full bg-gray-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-indigo-500"
+                >
+                    Login
+                </Link>
+            }
+            else {
+                <button
+                    type='submit'
+                    className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-green-500"
+                >
+                    <Oval
+                        color='#fff'
+                        height={20}
+                        width={20}
+                    />
+                </button>
+            }
 
         }
         else {
@@ -175,8 +193,7 @@ const CheckOut = ({
                         {
                             loading
                                 ?
-                                <button
-                                    type='submit'
+                                <button                                    
                                     className="w-full bg-indigo-600 border border-transparent rounded-md shadow-sm py-3 px-4 text-base font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-50 focus:ring-green-500"
                                 >
                                     <Oval
@@ -199,6 +216,44 @@ const CheckOut = ({
         }
     }
 
+    // const buy = async e => {
+    //     e.preventDefault();
+    //     let nonce = await data.instance.requestPaymentMethod();
+    //     if (coupon && coupon !== null && coupon !== undefined) {
+    //         process_payment(
+    //             nonce,
+    //             shipping_id,
+    //             coupon.name,
+    //             full_name,
+    //             address_line_1,
+    //             address_line_2,
+    //             city,
+    //             state_province_region,
+    //             postal_zip_code,
+    //             country_region,
+    //             phone_number
+    //         );
+    //     } else {
+    //         process_payment(
+    //             nonce,
+    //             shipping_id,
+    //             '',
+    //             full_name,
+    //             address_line_1,
+    //             address_line_2,
+    //             city,
+    //             state_province_region,
+    //             postal_zip_code,
+    //             country_region,
+    //             phone_number
+    //         );
+    //     }
+    // }
+
+
+    if (made_payment) {
+        return <Navigate to="thankyou" />
+    }
 
 
 
