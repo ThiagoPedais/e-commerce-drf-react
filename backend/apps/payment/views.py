@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import permissions, status
 from apps.cart.models import Cart, CartItem
+from apps.coupons.models import FixedPriceCoupon, PercentageCoupon
 from apps.orders.models import Order, OrderItem
 from apps.product.models import Product
 from apps.shipping.models import Shipping
@@ -40,15 +41,18 @@ class GetPaymentTotalView(APIView):
     def get(self, request, format=None):
         user = self.request.user
 
-        tax = 0.38
+        tax = 0.18
 
         shipping_id = request.query_params.get('shipping_id')
         shipping_id = str(shipping_id)
 
+        coupon_name = request.query_params.get('coupon_name')
+        coupon_name = str(coupon_name)
+
         try:
             cart = Cart.objects.get(user=user)
 
-            # review if exist items
+            # if exists items
             if not CartItem.objects.filter(cart=cart).exists():
                 return Response(
                     {'error': 'Need to have items in cart'},
@@ -56,10 +60,11 @@ class GetPaymentTotalView(APIView):
                 )
 
             cart_items = CartItem.objects.filter(cart=cart)
+
             for cart_item in cart_items:
                 if not Product.objects.filter(id=cart_item.product.id).exists():
                     return Response(
-                        {'error': 'A product with Id provided does not exist'},
+                        {'error': 'A proudct with ID provided does not exist'},
                         status=status.HTTP_404_NOT_FOUND
                     )
                 if int(cart_item.count) > int(cart_item.product.quantity):
@@ -72,36 +77,67 @@ class GetPaymentTotalView(APIView):
                 total_compare_amount = 0.0
 
                 for cart_item in cart_items:
-                    total_amount += (float(cart_item.product.price) * float(cart_item.count))
-                    total_compare_amount += (float(cart_item.product.compare_price) * float(cart_item.count))
+                    total_amount += (float(cart_item.product.price)
+                                     * float(cart_item.count))
+                    total_compare_amount += (float(cart_item.product.compare_price)
+                                             * float(cart_item.count))
 
-                total_amount = round(total_compare_amount, 2)
+                total_compare_amount = round(total_compare_amount, 2)
                 original_price = round(total_amount, 2)
 
                 # Coupons
+                if coupon_name != '':
+                    # coupon fixed is valid
+                    if FixedPriceCoupon.objects.filter(name__iexact=coupon_name).exists():
+                        fixed_price_coupon = FixedPriceCoupon.objects.get(
+                            name=coupon_name
+                        )
+                    discount_amount = float(fixed_price_coupon.discount_price)
+                    if discount_amount < total_amount:
+                        total_amount -= discount_amount
+                        total_after_coupon = total_amount
+
+                    elif PercentageCoupon.objects.filter(name__iexact=coupon_name).exists():
+                        percentage_coupon = PercentageCoupon.objects.get(
+                            name=coupon_name
+                        )
+                        discount_percentage = float(
+                            percentage_coupon.discount_percentage)
+
+                        if 1 < discount_percentage < 100:
+                            total_amount -= (total_amount *
+                                             (discount_percentage / 100))
+                            total_after_coupon = total_amount
+
+                # Total after coupon
+                total_after_coupon = round(total_after_coupon, 2)
 
                 # tax
                 estimated_tax = round(total_amount * tax, 2)
+
                 total_amount += (total_amount * tax)
 
                 shipping_cost = 0.0
-                # sending is valid
+                # send is valid
                 if Shipping.objects.filter(id__iexact=shipping_id).exists():
-                    # Add shipping in total amount
+                    # add shipping a total amount
                     shipping = Shipping.objects.get(id=shipping_id)
                     shipping_cost = shipping.price
                     total_amount += float(shipping_cost)
 
                 total_amount = round(total_amount, 2)
 
-                return Response(
-                    {'original_price': f'{original_price:.2f}',
-                     'total_amount': f'{total_amount:.2f}',
-                     'total_compare_amount': f'{total_compare_amount:.2f}',
-                     'estimated_tax': f'{estimated_tax:.2f}',
-                     'shipping_cost': f'{shipping_cost:.2f}'},
+                return Response({
+                    'original_price': f'{original_price:.2f}',
+                    'total_after_coupon': f'{total_after_coupon:.2f}',
+                    'total_amount': f'{total_amount:.2f}',
+                    'total_compare_amount': f'{total_compare_amount:.2f}',
+                    'estimated_tax': f'{estimated_tax:.2f}',
+                    'shipping_cost': f'{shipping_cost:.2f}'
+                },
                     status=status.HTTP_200_OK
                 )
+
         except:
             return Response(
                 {'error': 'Something went wrong when retrieving payment total information'},
@@ -118,7 +154,7 @@ class ProcessPaymentView(APIView):
 
         nonce = data['nonce']
         shipping_id = str(data['shipping_id'])
-        # Coupon name
+        coupon_name = str(data['coupon_name'])
 
         full_name = data['full_name']
         address_line_1 = data['address_line_1']
@@ -166,7 +202,18 @@ class ProcessPaymentView(APIView):
                 total_amount += (float(cart_item.product.price) * float(cart_item.count))
 
             # Coupons
-            # =======
+            if coupon_name != '':
+                if FixedPriceCoupon.objects.filter(name__iexact=coupon_name).exists():
+                    fixed_price_coupon = FixedPriceCoupon.objects.get(name=coupon_name)
+                    discount_amount = float(fixed_price_coupon.discount_price)
+                    if discount_amount < total_amount:
+                        total_amount -= discount_amount
+            elif PercentageCoupon.objects.filter(name__iexact=coupon_name).exists():
+                percentage_coupon = PercentageCoupon.objects.get(name=coupon_name)
+                discount_percentage = float(percentage_coupon.discount_percentage)
+
+                if 1 < discount_percentage < 100:
+                    total_amount -= (total_amount * (discount_percentage / 100))
 
             total_amount += (total_amount * tax)
 

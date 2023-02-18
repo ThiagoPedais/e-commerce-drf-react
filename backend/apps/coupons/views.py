@@ -6,7 +6,7 @@ from .serializers import FixedPriceCouponSerializer, PercentageCouponSerializer
 
 
 class CheckCouponView(APIView):
-    def get_view_name(self, request, format=None):
+    def get(self, request, format=None):
         try:
             coupon_name = request.query_params.get('coupon_name')
 

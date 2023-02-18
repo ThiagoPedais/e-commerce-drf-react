@@ -40,7 +40,7 @@ export const get_payment_total = (shipping_id: number | string, coupon_name: str
         }
 
         try {
-            const res = await axios.get(`${URL}/get-payment-total?shipping_id${shipping_id}`, config)
+            const res = await axios.get(`${URL}/get-payment-total?shipping_id=${shipping_id}&coupon_name=${coupon_name}`, config)
 
             if (res.status === 200 && !res.data.error) {
                 dispatch({
