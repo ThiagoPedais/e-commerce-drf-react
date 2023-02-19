@@ -6,7 +6,7 @@ import {
     GET_COUPON_FAIL,
 } from './types';
 
-const URL = `${import.meta.env.VITE_BACKEND_URL}/api/coupons/`
+const URL = `${import.meta.env.VITE_BACKEND_URL}/api/coupons`
 
 export const check_coupon = (coupon_name: string) => async (dispatch: Dispatch) => {
     const config = {

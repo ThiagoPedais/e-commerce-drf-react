@@ -23,7 +23,7 @@ class CheckCouponView(APIView):
                 coupon = PercentageCouponSerializer(coupon)
 
                 return Response(
-                    {'error': coupon.data},
+                    {'coupon': coupon.data},
                     status=status.HTTP_200_OK
                 )
             else:

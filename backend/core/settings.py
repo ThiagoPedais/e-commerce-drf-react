@@ -36,6 +36,7 @@ DJANGO_APPS = [
 
 PROJECT_APPS = [
     'apps.user',
+    'apps.user_profile',
 ]
 ECOMMERCE_APPS = [
     'apps.category',

@@ -122,7 +122,7 @@ const CheckOut = ({
     const apply_coupon = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        check_coupon(check_coupon)
+        check_coupon(coupon_name)
     }
 
     useEffect(() => {
