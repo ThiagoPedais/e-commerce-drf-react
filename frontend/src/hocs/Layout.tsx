@@ -9,6 +9,7 @@ import {
     get_total,
     get_item_total
 } from '../redux/actions/cart'
+import { get_user_profile } from "../redux/actions/profile";
 
 import Footer from "../components/navigation/Footer";
 import Navbar from "../components/navigation/Navbar";
@@ -24,6 +25,7 @@ interface LayoutProps {
     get_item: () => void;
     get_total: () => void;
     get_item_total: () => void;
+    get_user_profile: () => void;
     // refresh: () => void;
 }
 
@@ -36,6 +38,7 @@ const Layout:React.FC<LayoutProps> = (props) => {
         props.get_item()
         props.get_total()
         props.get_item_total()
+        props.get_user_profile()
     }, [])
 
     return(
@@ -52,7 +55,8 @@ const mapDispatchToProps = {
     load_user,
     get_item,
     get_total,
-    get_item_total
+    get_item_total,
+    get_user_profile
     // refresh,
   };
 
