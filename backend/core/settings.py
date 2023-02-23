@@ -47,6 +47,7 @@ ECOMMERCE_APPS = [
     'apps.payment',
     'apps.coupons',
     'apps.wishlist',
+    'apps.reviews'
 ]
 THIRD_PARTY_APPS = [
     'corsheaders',
