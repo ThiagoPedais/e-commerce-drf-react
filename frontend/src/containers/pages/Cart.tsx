@@ -10,10 +10,14 @@ import {
     get_total,
     get_item_total
 } from '../../redux/actions/cart'
+import {    
+    remove_wishlist_item
+} from '../../redux/actions/wishlist'
 
 import { CheckIcon, ClockIcon, QuestionMarkCircleIcon } from '@heroicons/react/20/solid'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { setALert } from '../../redux/actions/alert'
+import WishlistItem from '../../components/cart/WishlistItem'
 
 
 
@@ -64,7 +68,9 @@ const Cart = ({
     compare_amount,
     total_items,
     remove_item,
-    update_item
+    update_item,
+    wishlist_items,
+    remove_wishlist_item
 }: any) => {
 
     const [render, setRender] = useState(false)
@@ -94,6 +100,35 @@ const Cart = ({
                                     count={count}
                                     update_item={update_item}
                                     remove_item={remove_item}
+                                    render={render}
+                                    setRender={setRender}
+                                    setALert={setALert}
+                                />
+                            </div>
+                        )
+                    })
+                }
+            </div>
+        )
+    }
+
+    const showWishlistItems = () => {
+        return (
+            <div>
+                {
+                    wishlist_items &&
+                    wishlist_items !== null &&
+                    wishlist_items !== undefined &&
+                    wishlist_items.length !== 0 &&
+                    wishlist_items.map((item: { count: any }, index: Key | null | undefined) => {
+                        let count = item.count
+                        return (
+                            <div key={index}>
+                                <WishlistItem
+                                    item={item}
+                                    count={count}
+                                    update_item={update_item}
+                                    remove_wishlist_item={remove_wishlist_item}
                                     render={render}
                                     setRender={setRender}
                                     setALert={setALert}
@@ -150,8 +185,7 @@ const Cart = ({
             )
 
         }
-    }
-
+    }    
 
     return (
         <Layout>
@@ -221,6 +255,7 @@ const Cart = ({
                             </div>
                         </section>
                     </div>
+                    {showWishlistItems()}
                 </div>
             </div>
         </Layout>
@@ -230,6 +265,7 @@ const Cart = ({
 const mapStateToProps = (state: any) => ({
     isAuthenticated: state.Auth.isAuthenticated,
     items: state.Cart.items,
+    wishlist_items: state.Wishlist.items,
     amount: state.Cart.amount,
     compare_amount: state.Cart.compare_amount,
     total_items: state.Cart.total_items,
@@ -240,5 +276,6 @@ export default connect(mapStateToProps, {
     get_total,
     get_item_total,
     remove_item,
-    update_item
+    update_item,
+    remove_wishlist_item
 })(Cart)
