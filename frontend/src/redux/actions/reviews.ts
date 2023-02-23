@@ -27,7 +27,7 @@ export const get_reviews = (product_id: number | string) => async (dispatch: Dis
     }
 
     try {
-        const res = await axios.get(`'${URL}/get-reviews/${product_id}`, config)
+        const res = await axios.get(`${URL}/get-reviews/${product_id}`, config)
 
         if (res.status === 200) {
             dispatch({

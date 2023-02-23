@@ -5,15 +5,15 @@ from apps.product.models import Product
 from .models import Review
 
 
-class GetProductReviewView(APIView):
-    permission_classes = (permissions.AllowAny)
+class GetProductReviewsView(APIView):
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request, productId, format=None):
         try:
             product_id = int(productId)
         except:
             return Response(
-                {'error': 'Product Id must be an integer'},
+                {'error': 'Product ID must be an integer'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -23,6 +23,7 @@ class GetProductReviewView(APIView):
                     {'error': 'This product does not exist'},
                     status=status.HTTP_404_NOT_FOUND
                 )
+
             product = Product.objects.get(id=product_id)
 
             results = []
@@ -33,19 +34,21 @@ class GetProductReviewView(APIView):
                 ).filter(product=product)
 
                 for review in reviews:
-                    item = {
-                        'id': review.id,
-                        'rating': review.rating,
-                        'comment': review.comment,
-                        'date_created': review.date_created,
-                        'user': review.user.first_name
-                    }
+                    item = {}
+
+                    item['id'] = review.id
+                    item['rating'] = review.rating
+                    item['comment'] = review.comment
+                    item['date_created'] = review.date_created
+                    item['user'] = review.user.first_name
 
                     results.append(item)
+
             return Response(
                 {'reviews': results},
                 status=status.HTTP_200_OK
             )
+
         except:
             return Response(
                 {'error': 'Something went wrong when retrieving reviews'},
@@ -53,7 +56,7 @@ class GetProductReviewView(APIView):
             )
 
 
-class GetProductReviewsView(APIView):
+class GetProductReviewView(APIView):
     def get(self, request, productId, format=None):
         user = self.request.user
 
@@ -153,13 +156,13 @@ class CreateProductReviewView(APIView):
                 )
 
                 for review in reviews:
-                    item = {
-                        'id': review.id,
-                        'rating': review.rating,
-                        'comment': review.comment,
-                        'date_created': review.date_created,
-                        'user': review.user.first_name
-                    }
+                    item = {}
+
+                    item['id'] = review.id
+                    item['rating'] = review.rating
+                    item['comment'] = review.comment
+                    item['date_created'] = review.date_created
+                    item['user'] = review.user.first_name
 
                     results.append(item)
 
@@ -183,7 +186,7 @@ class UpdateProductReviewView(APIView):
             product_id = int(productId)
         except:
             return Response(
-                {'error': 'Product Id must be an integer'},
+                {'error': 'Product ID must be an integer'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
@@ -194,7 +197,6 @@ class UpdateProductReviewView(APIView):
                 {'error': 'Rating must be a decimal value'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
         try:
             comment = str(data['comment'])
         except:
@@ -221,7 +223,7 @@ class UpdateProductReviewView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
 
-            if Review.objects.get(user=user, product=product).exists():
+            if Review.objects.filter(user=user, product=product).exists():
                 Review.objects.filter(user=user, product=product).update(
                     rating=rating,
                     comment=comment
@@ -240,14 +242,16 @@ class UpdateProductReviewView(APIView):
                 )
 
                 for review in reviews:
-                    item = {
-                        'id': review.id,
-                        'rating': review.rating,
-                        'comment': review.comment,
-                        'date_created': review.date_created,
-                        'user': review.user,
-                    }
+                    item = {}
+
+                    item['id'] = review.id
+                    item['rating'] = review.rating
+                    item['comment'] = review.comment
+                    item['date_created'] = review.date_created
+                    item['user'] = review.user.first_name
+
                     results.append(item)
+
             return Response(
                 {'review': result, 'reviews': results},
                 status=status.HTTP_200_OK
@@ -290,13 +294,13 @@ class DeleteProductReviewView(APIView):
                 )
 
                 for review in reviews:
-                    item = {
-                        'id': review.id,
-                        'rating': review.rating,
-                        'comment': review.comment,
-                        'date_created': review.date_created,
-                        'user': review.user.first_name
-                    }
+                    item = {}
+
+                    item['id'] = review.id
+                    item['rating'] = review.rating
+                    item['comment'] = review.comment
+                    item['date_created'] = review.date_created
+                    item['user'] = review.user.first_name
 
                     results.append(item)
 
@@ -371,13 +375,13 @@ class FilterProductReviewsView(APIView):
                     )
 
                 for review in reviews:
-                    item = {
-                        'id': review.id,
-                        'rating': review.rating,
-                        'comment': review.comment,
-                        'date_created': review.date_created,
-                        'user': review.user.first_name
-                    }
+                    item = {}
+
+                    item['id'] = review.id
+                    item['rating'] = review.rating
+                    item['comment'] = review.comment
+                    item['date_created'] = review.date_created
+                    item['user'] = review.user.first_name
 
                     results.append(item)
 

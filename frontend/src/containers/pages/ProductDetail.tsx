@@ -130,6 +130,57 @@ const ProductDetail = ({
         get_reviews(productId)
     }, [productId])
 
+    const [rating_, setRating] = useState(5.0)
+
+    const [formData, setFormData] = useState({        
+        comment: '',
+        rating: ''
+    })
+    const { comment, rating } = formData
+
+
+    const onChange = (e: React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLSelectElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        })
+    }
+    const leaveReview = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (rating !== null) {
+            create_review(productId, rating, comment)
+        }
+    }
+
+    const updateReview = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (rating !== null) {
+            update_review(productId, rating, comment)
+        }
+    }
+
+    const deleteReview = () => {
+        const fetchData = async () => {
+            await delete_review(productId)
+            await get_review(productId)
+            setRating(5.0)
+            setFormData({
+                comment: '',
+                rating: ''
+            })
+            fetchData()
+        }
+    }
+
+    const filterReviews = (numStars: number | string) => {
+        filter_reviews(productId, numStars)
+    }
+
+    const getReviews = () => {
+        get_reviews(productId)
+    }
+
+
     return (
         <Layout>
             <div className="bg-white">
@@ -254,49 +305,49 @@ const ProductDetail = ({
 
                                         <button
                                             className='btn btn-primary btn-sm mb-3 ml-6 mt-2 font-sofiapro-light'
-                                            // onClick={getReviews}
+                                        onClick={getReviews}
                                         >
                                             Show all
                                         </button>
                                         <div
                                             className='mb-1'
                                             style={{ cursor: 'pointer' }}
-                                            // onClick={() => filterReviews(5)}
+                                        onClick={() => filterReviews(5)}
                                         >
                                             <Stars rating={5.0} />
                                         </div>
                                         <div
                                             className='mb-1'
                                             style={{ cursor: 'pointer' }}
-                                            // onClick={() => filterReviews(4.0)}
+                                        onClick={() => filterReviews(4.0)}
                                         >
                                             <Stars rating={4.0} />
                                         </div>
                                         <div
                                             className='mb-1'
                                             style={{ cursor: 'pointer' }}
-                                            // onClick={() => filterReviews(3.0)}
+                                        onClick={() => filterReviews(3.0)}
                                         >
                                             <Stars rating={3.0} />
                                         </div>
                                         <div
                                             className='mb-1'
                                             style={{ cursor: 'pointer' }}
-                                            // onClick={() => filterReviews(2.0)}
+                                        onClick={() => filterReviews(2.0)}
                                         >
                                             <Stars rating={2.0} />
                                         </div>
                                         <div
                                             className='mb-1'
                                             style={{ cursor: 'pointer' }}
-                                            // onClick={() => filterReviews(1.0)}
+                                        onClick={() => filterReviews(1.0)}
                                         >
                                             <Stars rating={1.0} />
                                         </div>
                                     </div>
                                     {
                                         review && isAuthenticated ?
-                                            <form /*onSubmit={e => updateReview(e)}*/>
+                                            <form onSubmit={e => updateReview(e)}>
                                                 <div>
                                                     <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
                                                         Add your review
@@ -307,8 +358,8 @@ const ProductDetail = ({
                                                             name="comment"
                                                             id="comment"
                                                             required
-                                                            // value={comment}
-                                                            // onChange={e => onChange(e)}
+                                                            value={comment}
+                                                            onChange={e => onChange(e)}
                                                             placeholder={review.comment}
                                                             className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                                             defaultValue={''}
@@ -319,8 +370,8 @@ const ProductDetail = ({
                                                     name="rating"
                                                     className="mt-4 float-right"
                                                     required
-                                                    // value={rating}
-                                                    // onChange={e => onChange(e)}
+                                                    value={rating}
+                                                    onChange={e => onChange(e)}
                                                     placeholder="0 - 5">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
@@ -336,7 +387,7 @@ const ProductDetail = ({
                                                 </button>
                                             </form> :
 
-                                            <form /*onSubmit={e => leaveReview(e)}*/>
+                                            <form onSubmit={e => leaveReview(e)}>
 
                                                 <div>
                                                     <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
@@ -348,8 +399,8 @@ const ProductDetail = ({
                                                             name="comment"
                                                             id="comment"
                                                             required
-                                                            // value={comment}
-                                                            // onChange={e => onChange(e)}
+                                                            value={comment}
+                                                            onChange={e => onChange(e)}
                                                             className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                                                             defaultValue={''}
                                                         />
@@ -359,8 +410,8 @@ const ProductDetail = ({
                                                     name="rating"
                                                     className="mt-4 float-right"
                                                     required
-                                                    // value={rating}
-                                                    // onChange={e => onChange(e)}
+                                                    value={rating}
+                                                    onChange={e => onChange(e)}
                                                     placeholder="0 - 5">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
@@ -378,7 +429,7 @@ const ProductDetail = ({
                                     }
                                 </div>
                                 <div className="col-span-3">
-                                    {reviews && reviews.map((review: { rating: any; user: string, comment: string}, index: number) => (
+                                    {reviews && reviews.map((review: { rating: any; user: string, comment: string }, index: number) => (
                                         <>
                                             <div className="flex">
                                                 <div className="mx-4 flex-shrink-0">
