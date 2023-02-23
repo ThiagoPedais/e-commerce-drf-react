@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { JSXElementConstructor, ReactElement, ReactFragment, ReactPortal, useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Navigate, useNavigate, useParams } from 'react-router-dom'
 import Layout from '../../hocs/Layout'
@@ -21,10 +21,20 @@ import {
     get_wishlist_item_total,
     remove_wishlist_item,
 } from '../../redux/actions/wishlist'
+import {
+    get_reviews,
+    get_review,
+    create_review,
+    update_review,
+    delete_review,
+    filter_reviews
+} from '../../redux/actions/reviews';
+
 
 
 import ImageGalery from '../../components/product/ImageGalery'
 import WishlistHeart from '../../components/product/WishlistHeart'
+import Stars from '../../components/product/Stars'
 
 
 
@@ -41,7 +51,15 @@ const ProductDetail = ({
     get_wishlist_items,
     get_wishlist_item_total,
     isAuthenticated,
-    wishlist }: any) => {
+    wishlist,
+    get_reviews,
+    get_review,
+    create_review,
+    update_review,
+    delete_review,
+    filter_reviews,
+    review,
+    reviews }: any) => {
 
 
     const [loading, setLoading] = useState(false)
@@ -107,6 +125,10 @@ const ProductDetail = ({
         get_wishlist_items()
         get_wishlist_item_total()
     }, [])
+
+    useEffect(() => {
+        get_reviews(productId)
+    }, [productId])
 
     return (
         <Layout>
@@ -224,13 +246,162 @@ const ProductDetail = ({
 
                                 </div>
                             </div>
-
-                            <section aria-labelledby="details-heading" className="mt-12">
-                                <h2 id="details-heading" className="sr-only">
-                                    Additional details
-                                </h2>
-                            </section>
                         </div>
+                        <section className='my-5 max-w-7xl'>
+                            <div className="grid grid-cols-5">
+                                <div className="col-span-2">
+                                    <div>
+
+                                        <button
+                                            className='btn btn-primary btn-sm mb-3 ml-6 mt-2 font-sofiapro-light'
+                                            // onClick={getReviews}
+                                        >
+                                            Show all
+                                        </button>
+                                        <div
+                                            className='mb-1'
+                                            style={{ cursor: 'pointer' }}
+                                            // onClick={() => filterReviews(5)}
+                                        >
+                                            <Stars rating={5.0} />
+                                        </div>
+                                        <div
+                                            className='mb-1'
+                                            style={{ cursor: 'pointer' }}
+                                            // onClick={() => filterReviews(4.0)}
+                                        >
+                                            <Stars rating={4.0} />
+                                        </div>
+                                        <div
+                                            className='mb-1'
+                                            style={{ cursor: 'pointer' }}
+                                            // onClick={() => filterReviews(3.0)}
+                                        >
+                                            <Stars rating={3.0} />
+                                        </div>
+                                        <div
+                                            className='mb-1'
+                                            style={{ cursor: 'pointer' }}
+                                            // onClick={() => filterReviews(2.0)}
+                                        >
+                                            <Stars rating={2.0} />
+                                        </div>
+                                        <div
+                                            className='mb-1'
+                                            style={{ cursor: 'pointer' }}
+                                            // onClick={() => filterReviews(1.0)}
+                                        >
+                                            <Stars rating={1.0} />
+                                        </div>
+                                    </div>
+                                    {
+                                        review && isAuthenticated ?
+                                            <form /*onSubmit={e => updateReview(e)}*/>
+                                                <div>
+                                                    <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
+                                                        Add your review
+                                                    </label>
+                                                    <div className="mt-1">
+                                                        <textarea
+                                                            rows={4}
+                                                            name="comment"
+                                                            id="comment"
+                                                            required
+                                                            // value={comment}
+                                                            // onChange={e => onChange(e)}
+                                                            placeholder={review.comment}
+                                                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                            defaultValue={''}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <select
+                                                    name="rating"
+                                                    className="mt-4 float-right"
+                                                    required
+                                                    // value={rating}
+                                                    // onChange={e => onChange(e)}
+                                                    placeholder="0 - 5">
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                </select>
+                                                <button
+                                                    type="submit"
+                                                    className="mt-4  inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                >
+                                                    Update
+                                                </button>
+                                            </form> :
+
+                                            <form /*onSubmit={e => leaveReview(e)}*/>
+
+                                                <div>
+                                                    <label htmlFor="comment" className="block text-sm font-medium text-gray-700">
+                                                        Add your review
+                                                    </label>
+                                                    <div className="mt-1">
+                                                        <textarea
+                                                            rows={4}
+                                                            name="comment"
+                                                            id="comment"
+                                                            required
+                                                            // value={comment}
+                                                            // onChange={e => onChange(e)}
+                                                            className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+                                                            defaultValue={''}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <select
+                                                    name="rating"
+                                                    className="mt-4 float-right"
+                                                    required
+                                                    // value={rating}
+                                                    // onChange={e => onChange(e)}
+                                                    placeholder="0 - 5">
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                </select>
+                                                <button
+                                                    type="submit"
+                                                    className="mt-4  inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                >
+                                                    Add
+                                                </button>
+                                            </form>
+                                    }
+                                </div>
+                                <div className="col-span-3">
+                                    {reviews && reviews.map((review: { rating: any; user: string, comment: string}, index: number) => (
+                                        <>
+                                            <div className="flex">
+                                                <div className="mx-4 flex-shrink-0">
+                                                    <span className="inline-block h-10 w-10 rounded-full overflow-hidden bg-gray-100">
+                                                        <svg className="h-full w-full text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                                <div>
+                                                    <Stars rating={review.rating} />
+                                                    <h4 className="text-lg font-bold">{review.user}</h4>
+                                                    <p className="mt-1">
+                                                        {review.comment}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ))}
+                                </div>
+
+                            </div>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -242,6 +413,8 @@ const mapStateToProps = (state: any) => ({
     product: state.Products.product,
     isAuthenticated: state.Auth.isAuthenticated,
     wishlist: state.Wishlist.wishlist,
+    review: state.Reviews.review,
+    reviews: state.Reviews.reviews
 })
 
 
@@ -257,4 +430,10 @@ export default connect(mapStateToProps, {
     get_wishlist_items,
     get_wishlist_item_total,
     remove_wishlist_item,
+    get_reviews,
+    get_review,
+    create_review,
+    update_review,
+    delete_review,
+    filter_reviews
 })(ProductDetail)
